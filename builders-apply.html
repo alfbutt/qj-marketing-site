@@ -43,7 +43,7 @@
   }
   h1.headline {
     margin: 28px 0 0;
-    font-size: clamp(1.5rem, 6vw, 2rem);
+    font-size: clamp(1.85rem, 8vw, 2.3rem);
     font-weight: 800;
     color: var(--ink);
     text-align: center;
@@ -375,6 +375,25 @@
 
 <script>
   const CALENDAR_URL = 'https://api.leadconnectorhq.com/widget/booking/9RYbpD9vjUFtkBLhJ7Ql';
+  // Paste your GoHighLevel "Inbound Webhook" trigger URL here to send leads through automatically.
+  const GHL_WEBHOOK_URL = 'PASTE_YOUR_GOHIGHLEVEL_INBOUND_WEBHOOK_URL_HERE';
+
+  function sendToGHL() {
+    if (!GHL_WEBHOOK_URL || GHL_WEBHOOK_URL.indexOf('PASTE_YOUR_') === 0) return;
+    fetch(GHL_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName: state.firstName,
+        email: state.email,
+        phone: state.phone,
+        licensed: state.licensed,
+        revenueOver350k: state.revenue,
+        source: 'qj-builders-apply-landing-page'
+      })
+    }).catch(err => console.error('GHL webhook failed', err));
+  }
+
   const state = { licensed: null, revenue: null, firstName: '', email: '', phone: '' };
   let stepIndex = 0;
 
@@ -404,6 +423,24 @@
             <button class="opt-btn" onclick="choose('revenue', true)">Yes</button>
             <button class="opt-btn secondary" onclick="choose('revenue', false)">No</button>
           </div>
+        </div>`
+    },
+    {
+      id: 'disqualified-licensed',
+      progress: 100,
+      render: () => `
+        <div class="step centered fade-in">
+          <h2>Thanks for your interest</h2>
+          <p class="hint">Quality Jobs currently only partners with licensed &amp; insured renovators. Get in touch once you're licensed and insured — we'd love to help then.</p>
+        </div>`
+    },
+    {
+      id: 'disqualified-revenue',
+      progress: 100,
+      render: () => `
+        <div class="step centered fade-in">
+          <h2>Thanks for your interest</h2>
+          <p class="hint">Quality Jobs currently only partners with renovation businesses already turning over $350K+ a year. Check back in once you've hit that milestone.</p>
         </div>`
     },
     {
@@ -483,7 +520,13 @@
 
   function choose(key, value) {
     state[key] = value;
-    stepIndex++;
+    if (key === 'licensed' && value === false) {
+      stepIndex = steps.findIndex(s => s.id === 'disqualified-licensed');
+    } else if (key === 'revenue' && value === false) {
+      stepIndex = steps.findIndex(s => s.id === 'disqualified-revenue');
+    } else {
+      stepIndex++;
+    }
     renderStep();
   }
 
@@ -515,6 +558,7 @@
     stepIndex++;
     renderStep();
     if (key === 'phone') {
+      sendToGHL();
       setTimeout(() => { window.location.href = CALENDAR_URL; }, 1800);
     }
   }
