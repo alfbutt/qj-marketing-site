@@ -458,7 +458,7 @@
           <input class="text-input" id="emailInput" type="email" placeholder="you@company.com.au" value="${state.email}">
           <button class="continue-btn" id="emailContinue" disabled onclick="submitText('email')">Continue</button>
         </div>`,
-      afterRender: () => bindTextInput('emailInput', 'emailContinue', true)
+      afterRender: () => bindTextInput('emailInput', 'emailContinue', 'email')
     },
     {
       id: 'phone',
@@ -467,11 +467,12 @@
         <div class="step fade-in">
           ${backButton()}
           <h2>What's your phone number?</h2>
-          <p class="hint">Please enter your mobile number:</p>
-          <input class="text-input" id="phoneInput" type="tel" placeholder="04XX XXX XXX" value="${state.phone}">
+          <p class="hint">Please enter a valid Australian mobile or landline number:</p>
+          <input class="text-input" id="phoneInput" type="tel" inputmode="tel" placeholder="04XX XXX XXX" value="${state.phone}">
+          <p class="hint" id="phoneError" style="display:none; color:#b9432f; margin-top:8px;">Please enter a complete Australian number (10 digits, e.g. 0412 345 678).</p>
           <button class="continue-btn" id="phoneContinue" disabled onclick="submitText('phone')">Continue</button>
         </div>`,
-      afterRender: () => bindTextInput('phoneInput', 'phoneContinue')
+      afterRender: () => bindTextInput('phoneInput', 'phoneContinue', 'phone')
     },
     {
       id: 'done',
@@ -543,13 +544,31 @@
     renderStep();
   }
 
-  function bindTextInput(inputId, btnId, isEmail) {
+  function isValidAUPhone(value) {
+    const digits = value.replace(/\D/g, '');
+    // 10 digits starting with 0 (e.g. 0412345678, 0398765432)
+    // or country code + 9 digits (e.g. 61412345678)
+    return /^0\d{9}$/.test(digits) || /^61\d{9}$/.test(digits);
+  }
+
+  function bindTextInput(inputId, btnId, type) {
     const input = document.getElementById(inputId);
     const btn = document.getElementById(btnId);
+    const errorEl = document.getElementById(inputId.replace('Input', 'Error'));
     const validate = () => {
       const val = input.value.trim();
-      const ok = isEmail ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) : val.length > 0;
+      let ok;
+      if (type === 'email') {
+        ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+      } else if (type === 'phone') {
+        ok = isValidAUPhone(val);
+      } else {
+        ok = val.length > 0;
+      }
       btn.disabled = !ok;
+      if (errorEl) {
+        errorEl.style.display = (!ok && val.length > 0) ? 'block' : 'none';
+      }
     };
     input.addEventListener('input', validate);
     input.addEventListener('keydown', (e) => {
