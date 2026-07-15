@@ -388,7 +388,7 @@
   const GHL_WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/mMtrTqbMqNOoKetdQowt/webhook-trigger/8e25236f-80ad-4775-9840-0aaa060cda69';
 
   function sendToGHL() {
-    if (!GHL_WEBHOOK_URL || GHL_WEBHOOK_URL.indexOf('PASTE_YOUR_') === 0) return;
+    if (!GHL_WEBHOOK_URL || GHL_WEBHOOK_URL.indexOf('PASTE_YOUR_') === 0) return Promise.resolve();
     const payload = JSON.stringify({
       firstName: state.firstName,
       email: state.email,
@@ -397,15 +397,7 @@
       revenueOver350k: state.revenue,
       source: 'qj-builders-apply-landing-page'
     });
-    // sendBeacon is built specifically to survive the page navigating away right
-    // after firing — a plain fetch() can get cut short by the redirect below,
-    // arriving at GHL as an incomplete request with blank fields.
-    if (navigator.sendBeacon) {
-      const blob = new Blob([payload], { type: 'application/json' });
-      const ok = navigator.sendBeacon(GHL_WEBHOOK_URL, blob);
-      if (ok) return;
-    }
-    fetch(GHL_WEBHOOK_URL, {
+    return fetch(GHL_WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: payload,
@@ -595,8 +587,18 @@
     stepIndex++;
     renderStep();
     if (key === 'phone') {
-      sendToGHL();
-      setTimeout(() => { window.location.href = CALENDAR_URL; }, 1800);
+      let redirected = false;
+      const redirect = () => {
+        if (redirected) return;
+        redirected = true;
+        window.location.href = CALENDAR_URL;
+      };
+      // Wait for the webhook to actually finish sending before leaving the
+      // page — a fixed delay risks the browser cutting the request short
+      // mid-flight on a slow connection. The safety timeout below still
+      // guarantees the user is never stuck waiting on a hung request.
+      sendToGHL().then(redirect).catch(redirect);
+      setTimeout(redirect, 4000);
     }
   }
 
