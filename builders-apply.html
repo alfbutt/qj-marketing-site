@@ -389,17 +389,27 @@
 
   function sendToGHL() {
     if (!GHL_WEBHOOK_URL || GHL_WEBHOOK_URL.indexOf('PASTE_YOUR_') === 0) return;
+    const payload = JSON.stringify({
+      firstName: state.firstName,
+      email: state.email,
+      phone: state.phone,
+      licensed: state.licensed,
+      revenueOver350k: state.revenue,
+      source: 'qj-builders-apply-landing-page'
+    });
+    // sendBeacon is built specifically to survive the page navigating away right
+    // after firing — a plain fetch() can get cut short by the redirect below,
+    // arriving at GHL as an incomplete request with blank fields.
+    if (navigator.sendBeacon) {
+      const blob = new Blob([payload], { type: 'application/json' });
+      const ok = navigator.sendBeacon(GHL_WEBHOOK_URL, blob);
+      if (ok) return;
+    }
     fetch(GHL_WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        firstName: state.firstName,
-        email: state.email,
-        phone: state.phone,
-        licensed: state.licensed,
-        revenueOver350k: state.revenue,
-        source: 'qj-builders-apply-landing-page'
-      })
+      body: payload,
+      keepalive: true
     }).catch(err => console.error('GHL webhook failed', err));
   }
 
