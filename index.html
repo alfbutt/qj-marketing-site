@@ -135,20 +135,18 @@
   .hero-logo-glow{
     position:absolute; inset:-45%; z-index:1;
     background:radial-gradient(circle,
-      rgba(232,207,154,.55) 0%,
-      rgba(218,184,118,.32) 30%,
-      rgba(218,184,118,.12) 55%,
-      transparent 75%);
-    filter:blur(22px);
+      rgba(232,207,154,.5) 0%,
+      rgba(218,184,118,.28) 30%,
+      rgba(218,184,118,.1) 55%,
+      transparent 72%);
+    filter:blur(18px);
     animation:glowPulse 3.6s ease-in-out infinite;
   }
   @keyframes glowPulse{ 0%,100%{ opacity:.75; transform:scale(1);} 50%{ opacity:1; transform:scale(1.08);} }
   .hero-logo{
     position:relative; z-index:2;
     display:block; width:100%;
-    border-radius:22px;
-    -webkit-mask-image:radial-gradient(closest-side, black 82%, transparent 100%);
-    mask-image:radial-gradient(closest-side, black 82%, transparent 100%);
+    filter:drop-shadow(0 0 22px rgba(218,184,118,.45));
   }
   .hero h1{
     position:relative; z-index:2;
@@ -296,10 +294,10 @@
 </head>
 <body>
 
-  <div id="preloader"><img src="assets/logo.png" alt="Quality Jobs"><div class="count">0%</div></div>
+  <div id="preloader"><img src="assets/logo-transparent.png" alt="Quality Jobs"><div class="count">0%</div></div>
 
   <header class="chrome">
-    <a href="#top" class="chrome-mark"><img src="assets/logo.png" alt="">Quality Jobs</a>
+    <a href="#top" class="chrome-mark"><img src="assets/logo-transparent.png" alt="">Quality Jobs</a>
     <nav class="chrome-links">
       <a href="#work">Results</a>
       <a href="#contact">Contact</a>
@@ -321,7 +319,7 @@
       </div>
       <div class="hero-logo-wrap">
         <div class="hero-logo-glow"></div>
-        <img class="hero-logo" src="assets/logo.png" alt="Quality Jobs logo">
+        <img class="hero-logo" src="assets/logo-transparent.png" alt="Quality Jobs logo">
       </div>
       <h1>Are you looking for<br>your next job?</h1>
       <p class="sub">Quality Jobs keeps your calendar full of high-margin work — so you can focus on the tools, not the phone.</p>
