@@ -6,3 +6,4 @@
   from = "/"
   to = "/builders-apply.html"
   status = 200
+  force = true

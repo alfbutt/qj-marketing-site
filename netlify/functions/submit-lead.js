@@ -1,5 +1,5 @@
 const GHL_WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/mMtrTqbMqNOoKetdQowt/webhook-trigger/8e25236f-80ad-4775-9840-0aaa060cda69';
-const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwVPlxCAaKOIIMUynptV6yNRyrcSLh-wF5oGY_yxnPw8lWNEDT38ZVqznKZVRS3_HsoCQ/exec';
+const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx5Ir9_YLHzjQglxoBrUtTlw0WW4_-rpl0biXd3_Jm_0Fdrvwov-eBHZ5umTmPMRwRzzw/exec';
 
 async function postJSON(url, payload, attempt) {
   try {

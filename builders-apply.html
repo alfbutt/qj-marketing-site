@@ -402,13 +402,17 @@ src="https://www.facebook.com/tr?id=1607801233152631&ev=PageView&noscript=1"
 <script>
   const CALENDAR_URL = 'https://api.leadconnectorhq.com/widget/booking/9RYbpD9vjUFtkBLhJ7Ql';
   const LOG_ENDPOINT = '/.netlify/functions/submit-lead';
+  const SESSION_ID = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('sess-' + Date.now() + '-' + Math.random().toString(36).slice(2));
 
   // Same-origin call to our own Netlify function, which reliably forwards to
   // GHL (for completions) and logs every event to Google Sheets server-side —
   // this avoids the cross-origin browser request racing the page redirect.
+  // Fire-and-forget for step/progress events — only the final 'completed'
+  // event needs to be awaited before redirecting.
   function logEvent(eventType, extra) {
     const payload = Object.assign({
       eventType: eventType,
+      sessionId: SESSION_ID,
       firstName: state.firstName,
       email: state.email,
       phone: state.phone,
@@ -558,6 +562,7 @@ src="https://www.facebook.com/tr?id=1607801233152631&ev=PageView&noscript=1"
       showDisqualified('revenue');
       return;
     }
+    logEvent('step', { step: key + '_yes' });
     stepIndex++;
     renderStep();
   }
@@ -621,9 +626,12 @@ src="https://www.facebook.com/tr?id=1607801233152631&ev=PageView&noscript=1"
       // almost instantly. The safety timeout still guards against a hang.
       logEvent('completed').then(redirect).catch(redirect);
       setTimeout(redirect, 4000);
+    } else {
+      logEvent('step', { step: key + '_submitted' });
     }
   }
 
+  logEvent('step', { step: 'form_started' });
   renderStep();
 </script>
 </body>
