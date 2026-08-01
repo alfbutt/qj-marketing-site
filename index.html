@@ -283,6 +283,23 @@
   }
   .cta a.btn:hover{ transform:translateY(-3px); box-shadow:0 16px 40px rgba(218,184,118,.28); }
 
+  .cta-calendar{
+    margin-top:48px;
+    width:min(760px, 94vw);
+    max-width:100%;
+    border-radius:22px;
+    overflow:hidden;
+    background:var(--bg-alt);
+    border:1px solid rgba(218,184,118,.18);
+    box-shadow:0 30px 90px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.03);
+    opacity:.15;
+    transform:scale(.72) translateY(40px);
+    transform-origin:center bottom;
+    transition:transform .12s linear, opacity .12s linear;
+    will-change:transform, opacity;
+  }
+  .cta-calendar iframe{ display:block; width:100%; min-height:640px; border:none; }
+
   footer{
     position:relative; z-index:2;
     padding:36px 6vw; display:flex; justify-content:space-between; align-items:center;
@@ -334,8 +351,8 @@
       <span class="eyebrow">What We Do</span>
       <h2>We generate <em>high-quality, pre-qualified</em> job quotes for trades businesses across Australia.</h2>
       <div class="stats">
-        <div class="stat"><b>4–8+</b><span>New jobs / month</span></div>
-        <div class="stat"><b>$100k+</b><span>Added margin / month*</span></div>
+        <div class="stat"><b>$20M+</b><span>Added for clients in the last 12 months</span></div>
+        <div class="stat"><b>42%</b><span>Average close rate across delivered jobs</span></div>
         <div class="stat"><b>0</b><span>Time wasted on junk leads</span></div>
       </div>
     </section>
@@ -391,7 +408,9 @@
     <section class="cta" id="contact">
       <span class="eyebrow">Get Started</span>
       <h2>Ready for your next job?</h2>
-      <a class="btn" href="https://qualityjobs.com.au" target="_blank" rel="noopener">Book Your Growth Call</a>
+      <div class="cta-calendar" data-calendar>
+        <iframe src="https://api.leadconnectorhq.com/widget/booking/9RYbpD9vjUFtkBLhJ7Ql" allow="payment" style="width:100%;border:none;overflow:hidden;" scrolling="no" id="VLKd6yt2AFEfMAxFvlJM_1785577722606"></iframe>
+      </div>
     </section>
 
   </main>
@@ -402,6 +421,7 @@
     <div>© 2026 Quality Jobs. All rights reserved.</div>
   </footer>
 
+<script src="https://link.msgsndr.com/js/form_embed.js" type="text/javascript"></script>
 <script>
 (function(){
   // Preloader — fast, fake-but-honest progress since there are no heavy assets to wait on
@@ -422,6 +442,7 @@
   const tapeFill = document.getElementById('tape-fill');
   const swirls = document.querySelectorAll('[data-swirl]');
   const cards = document.querySelectorAll('[data-card]');
+  const calendarWrap = document.querySelector('[data-calendar]');
 
   function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
 
@@ -453,6 +474,19 @@
       ring.style.transform = 'scale(' + scale.toFixed(3) + ')';
       ring.style.opacity = (0.25 + local*0.75).toFixed(2);
     });
+
+    if(calendarWrap){
+      const rect = calendarWrap.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const start = vh;        // fully below the fold
+      const end = vh * 0.35;   // scrolled comfortably into view
+      const raw = (start - rect.top) / (start - end);
+      const local2 = clamp(raw, 0, 1);
+      const calScale = 0.72 + local2 * 0.28;
+      const calY = (1 - local2) * 40;
+      calendarWrap.style.transform = 'scale(' + calScale.toFixed(3) + ') translateY(' + calY.toFixed(1) + 'px)';
+      calendarWrap.style.opacity = (0.15 + local2*0.85).toFixed(2);
+    }
   }
 
   window.addEventListener('scroll', ()=> requestAnimationFrame(onScroll), { passive:true });
