@@ -320,6 +320,16 @@
     font-size:10px; letter-spacing:.14em; text-transform:uppercase;
     padding:5px 10px; border-radius:999px;
   }
+  .test-card .mute-toggle{
+    position:absolute; bottom:14px; right:14px; z-index:4;
+    width:34px; height:34px; border-radius:50%;
+    background:rgba(0,0,0,.55); backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.25); color:var(--ink);
+    font-size:15px; line-height:1; padding:0;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:background .25s, transform .25s;
+  }
+  .test-card .mute-toggle:hover{ background:rgba(0,0,0,.8); transform:scale(1.08); }
 
   /* ---------- CTA ---------- */
   .cta{
@@ -438,6 +448,7 @@
             <script src="https://fast.wistia.com/player.js" async></script>
             <script src="https://fast.wistia.com/embed/xn965wovn5.js" async type="module"></script>
             <wistia-player media-id="xn965wovn5" aspect="0.5625" muted loop autoplay="visible"></wistia-player>
+            <button class="mute-toggle" data-mute-toggle aria-label="Unmute video">🔇</button>
           </div>
           <div class="meta"><div class="name">Verified Client</div><div class="role">Builder / Renovator</div></div>
         </div>
@@ -448,6 +459,7 @@
             <script src="https://fast.wistia.com/player.js" async></script>
             <script src="https://fast.wistia.com/embed/adjhicf5yg.js" async type="module"></script>
             <wistia-player media-id="adjhicf5yg" aspect="0.5625" muted loop autoplay="visible"></wistia-player>
+            <button class="mute-toggle" data-mute-toggle aria-label="Unmute video">🔇</button>
           </div>
           <div class="meta"><div class="name">Verified Client</div><div class="role">Builder / Renovator</div></div>
         </div>
@@ -458,6 +470,7 @@
             <script src="https://fast.wistia.com/player.js" async></script>
             <script src="https://fast.wistia.com/embed/wko6o5imcn.js" async type="module"></script>
             <wistia-player media-id="wko6o5imcn" aspect="0.5625" muted loop autoplay="visible"></wistia-player>
+            <button class="mute-toggle" data-mute-toggle aria-label="Unmute video">🔇</button>
           </div>
           <div class="meta"><div class="name">Verified Client</div><div class="role">Builder / Renovator</div></div>
         </div>
@@ -562,6 +575,23 @@
 
   window.addEventListener('scroll', ()=> requestAnimationFrame(onScroll), { passive:true });
   onScroll();
+
+  // Mute/unmute toggle for testimonial videos
+  document.querySelectorAll('[data-mute-toggle]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const frame = btn.closest('.frame');
+      const player = frame && frame.querySelector('wistia-player');
+      if(!player) return;
+      const willUnmute = player.muted !== false;
+      document.querySelectorAll('wistia-player').forEach(p=>{ if(p !== player) p.muted = true; });
+      document.querySelectorAll('[data-mute-toggle]').forEach(b=>{
+        if(b !== btn){ b.textContent = '🔇'; b.setAttribute('aria-label','Unmute video'); }
+      });
+      player.muted = !willUnmute;
+      btn.textContent = willUnmute ? '🔊' : '🔇';
+      btn.setAttribute('aria-label', willUnmute ? 'Mute video' : 'Unmute video');
+    });
+  });
 
   // Pop up testimonial cards as the swirl above them resolves into view
   const io = new IntersectionObserver((entries)=>{
